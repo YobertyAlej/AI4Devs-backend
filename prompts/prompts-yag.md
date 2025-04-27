@@ -88,7 +88,7 @@ You need to implement two new endpoints:
 - An Application has one Position and one Candidate
 - An Application has many Interviews
 - Each Interview has a score that needs to be aggregated
-```md
+```
 
 ## 4 Prompt
 
