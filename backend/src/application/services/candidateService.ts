@@ -3,6 +3,9 @@ import { validateCandidateData } from '../validator';
 import { Education } from '../../domain/models/Education';
 import { WorkExperience } from '../../domain/models/WorkExperience';
 import { Resume } from '../../domain/models/Resume';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 export const addCandidate = async (candidateData: any) => {
     try {
@@ -61,5 +64,42 @@ export const findCandidateById = async (id: number): Promise<Candidate | null> =
     } catch (error) {
         console.error('Error al buscar el candidato:', error);
         throw new Error('Error al recuperar el candidato');
+    }
+};
+
+export const updateCandidateStageService = async (candidateId: number, interviewStepId: number) => {
+    try {
+        // Find the application for the candidate that needs to be updated
+        const application = await prisma.application.findFirst({
+            where: {
+                candidateId: candidateId
+            }
+        });
+
+        if (!application) {
+            return null;
+        }
+
+        // Update the application with the new interview step
+        const updatedApplication = await prisma.application.update({
+            where: {
+                id: application.id
+            },
+            data: {
+                currentInterviewStep: interviewStepId
+            },
+            include: {
+                interviewStep: {
+                    select: {
+                        name: true
+                    }
+                }
+            }
+        });
+
+        return updatedApplication;
+    } catch (error) {
+        console.error('Error updating candidate stage:', error);
+        throw new Error('Failed to update candidate stage');
     }
 };
